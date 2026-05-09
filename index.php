@@ -1,5 +1,5 @@
 <?php
-// public/index.php - Desain Terminal Retro Unik untuk Deployment SMKN 2 Pinrang
+//index.php - Desain Terminal Retro Unik untuk Deployment SMKN 2 Pinrang
 
 // Ambil data server sederhana untuk ditampilkan
 $phpVersion = phpversion();
