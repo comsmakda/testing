@@ -1,247 +1,370 @@
 <?php
-//index.php - Desain Terminal Retro Unik untuk Deployment SMKN 2 Pinrang
-
-// Ambil data server sederhana untuk ditampilkan
-$phpVersion = phpversion();
-$serverOs = php_uname('s');
-$currentTime = date('Y-m-d H:i:s T');
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
-$hostName = $_SERVER['HTTP_HOST'] ?? 'unknown_host';
+$serverInfo = [
+    'php_version' => phpversion(),
+    'server_time' => date('Y-m-d H:i:s'),
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+    'hostname' => gethostname(),
+    'os' => PHP_OS,
+];
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEPLOYMENT STATUS: ONLINE</title>
+    <title>COM SMKN 2 PINRANG — Server Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS INTERNAL - DESAIN TERMINAL RETRO CYBER --- */
         :root {
-            --bg-color: #080a10;
-            --main-color: #00ff41; /* Hijau Matrix */
-            --accent-color: #00bcd4; /* Cyan */
-            --text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
-            --font-family: 'Courier New', Courier, monospace;
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --accent: #00ff88;
+            --accent2: #ff3366;
+            --accent3: #3366ff;
+            --text: #e8e8f0;
+            --muted: #555570;
+            --mono: 'Space Mono', monospace;
+            --sans: 'Syne', sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--main-color);
-            font-family: var(--font-family);
-            font-size: 16px;
-            line-height: 1.5;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Mencegah scrollbar */
-            position: relative;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Efek Scanline CRT */
+        /* Grid background */
         body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            z-index: 100;
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             pointer-events: none;
-            opacity: 0.3;
+            z-index: 0;
         }
 
-        /* Container Utama */
-        .terminal-window {
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid var(--main-color);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+        .container {
             position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px;
         }
 
-        /* Header Jendela */
-        .terminal-header {
-            background: rgba(0, 255, 65, 0.1);
-            padding: 8px 15px;
-            border-bottom: 2px solid var(--main-color);
+        /* Header */
+        .header {
+            margin-bottom: 60px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,255,136,0.08);
+            border: 1px solid rgba(0,255,136,0.2);
+            color: var(--accent);
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 6px 14px;
+            border-radius: 2px;
+            margin-bottom: 24px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+        }
+
+        h1 .line1 { color: var(--text); display: block; }
+        h1 .line2 {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--accent);
+            display: block;
+        }
+
+        .subtitle {
+            margin-top: 16px;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 13px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Status grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 2px;
+            animation: fadeUp 0.6s ease 0.1s both;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s;
+        }
+
+        .card:hover { background: #16161f; }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--accent);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::after { transform: scaleY(1); }
+
+        .card-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-family: var(--mono);
+            font-size: 15px;
+            color: var(--accent);
+            word-break: break-all;
+        }
+
+        /* PHP Info section */
+        .section {
+            margin-top: 2px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px;
+            animation: fadeUp 0.6s ease 0.2s both;
+        }
+
+        .section-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            user-select: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(30,30,46,0.5);
+            gap: 16px;
         }
 
-        .header-title {
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 0.9em;
+        .info-row:last-child { border-bottom: none; }
+
+        .info-key {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--muted);
+            flex-shrink: 0;
         }
 
-        .header-buttons {
+        .info-val {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text);
+            text-align: right;
+        }
+
+        /* Success banner */
+        .success-banner {
+            margin-top: 2px;
+            background: rgba(0,255,136,0.05);
+            border: 1px solid rgba(0,255,136,0.15);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: fadeUp 0.6s ease 0.3s both;
+        }
+
+        .success-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .success-text {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+        }
+
+        .success-text strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            animation: fadeUp 0.6s ease 0.4s both;
+        }
+
+        .footer-left {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .footer-right {
             display: flex;
             gap: 6px;
         }
 
-        .btn { width: 12px; height: 12px; border-radius: 50%; }
-        .btn-red { background-color: #ff5f56; }
-        .btn-yellow { background-color: #ffbd2e; }
-        .btn-green { background-color: #27c93f; }
-
-        /* Konten Utama Terminal */
-        .terminal-content {
-            padding: 20px;
-            flex-grow: 1;
-            overflow-y: auto;
-            position: relative;
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
         }
 
-        /* Elemen Tipografi */
-        h1 {
-            font-size: 1.4em;
-            color: var(--accent-color);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            text-shadow: 0 0 8px rgba(0, 188, 212, 0.7);
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .ascii-art {
-            color: var(--main-color);
-            font-size: 0.8em;
-            white-space: pre;
-            margin-bottom: 20px;
-            line-height: 1.2;
-            text-shadow: var(--text-shadow);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
-        .log-entry {
-            margin-bottom: 8px;
-            display: flex;
-        }
-
-        .log-prefix { color: #888; margin-right: 10px; user-select: none; }
-        .log-label { color: var(--accent-color); margin-right: 5px; }
-        .log-value { color: #fff; font-weight: bold; }
-        .status-ok { color: #27c93f; font-weight: bold; animation: pulse 1.5s infinite; }
-
-        /* Footer / Input Prompt */
-        .terminal-footer {
-            padding: 10px 20px;
-            border-top: 1px solid rgba(0, 255, 65, 0.2);
-            color: #888;
-            font-size: 0.9em;
-        }
-
-        /* Animasi */
-        .cursor {
-            display: inline-block;
-            width: 10px; height: 1.2em;
-            background-color: var(--main-color);
-            margin-left: 5px;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        @keyframes pulse { 0%, 100% { opacity: 1; text-shadow: 0 0 5px #27c93f; } 50% { opacity: 0.6; text-shadow: 0 0 2px #27c93f; } }
-
-        /* Scrollbar Styling */
-        .terminal-content::-webkit-scrollbar { width: 8px; }
-        .terminal-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        .terminal-content::-webkit-scrollbar-thumb { background: rgba(0, 255, 65, 0.3); border-radius: 4px; }
-        .terminal-content::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 65, 0.5); }
-
-        /* Responsif */
         @media (max-width: 600px) {
-            body { font-size: 14px; }
-            h1 { font-size: 1.1em; }
-            .ascii-art { font-size: 0.6em; }
-            .terminal-window { height: 90vh; }
+            .footer { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .info-row { flex-direction: column; align-items: flex-start; }
+            .info-val { text-align: left; }
         }
     </style>
 </head>
 <body>
+<div class="container">
 
-    <div class="terminal-window">
-        <div class="terminal-header">
-            <div class="header-buttons">
-                <div class="btn btn-red"></div>
-                <div class="btn btn-yellow"></div>
-                <div class="btn btn-green"></div>
-            </div>
-            <div class="header-title">system_monitor@<?php echo htmlspecialchars($hostName); ?>:~</div>
-            <div></div> </div>
+    <header class="header">
+        <div class="badge">● Deployment Active</div>
+        <h1>
+            <span class="line1">Server</span>
+            <span class="line2">Running.</span>
+        </h1>
+        <p class="subtitle">// comsmkn2pinrang.my.id &mdash; PHP <?= phpversion() ?> on Coolify</p>
+    </header>
 
-        <div class="terminal-content">
-            <h1>SISTEM DEPLOYMENT SMKN 2 PINRANG</h1>
-
-            <div class="ascii-art">
-   _____ __  __ _  __
-  / ____|  \/  | |/ /
- | (___ | \  / | ' /
-  \___ \| |\/| |  <
-  ____) | |  | | . \
- |_____/|_|  |_|_|\_\
-            </div>
-
-            <div class="log-entry">
-                <span class="log-prefix">[OK]</span>
-                <span class="log-text">Initializing core service...</span>
-            </div>
-            <div class="log-entry">
-                <span class="log-prefix">[OK]</span>
-                <span class="log-text">Connecting to host: <span class="log-value"><?php echo htmlspecialchars($hostName); ?></span></span>
-            </div>
-            <div class="log-entry">
-                <span class="log-prefix">[OK]</span>
-                <span class="log-text">Web Server (Nginx) configured for folder <span class="log-value">/public</span>.</span>
-            </div>
-            <div class="log-entry">
-                <span class="log-prefix">[WARN]</span>
-                <span class="log-text">Database check skipped (Test Mode Active).</span>
-            </div>
-
-            <br>
-            <div class="log-entry" style="font-size: 1.1em;">
-                <span class="log-text">FINAL DEPLOYMENT STATUS: </span>
-                <span class="status-ok">ONLINE & ACTIVE</span>
-            </div>
-            <hr style="border: none; border-top: 1px solid rgba(0, 255, 65, 0.2); margin: 20px 0;">
-
-            <div class="log-entry">
-                <span class="log-label">Waktu Server:</span>
-                <span class="log-value"><?php echo htmlspecialchars($currentTime); ?></span>
-            </div>
-            <div class="log-entry">
-                <span class="log-label">Versi PHP:</span>
-                <span class="log-value"><?php echo htmlspecialchars($phpVersion); ?></span>
-            </div>
-            <div class="log-entry">
-                <span class="log-label">OS Server:</span>
-                <span class="log-value"><?php echo htmlspecialchars($serverOs); ?></span>
-            </div>
-            <div class="log-entry">
-                <span class="log-label">IP Anda:</span>
-                <span class="log-value"><?php echo htmlspecialchars($clientIp); ?></span>
-            </div>
-
+    <div class="grid">
+        <div class="card">
+            <div class="card-label">PHP Version</div>
+            <div class="card-value"><?= phpversion() ?></div>
         </div>
-
-        <div class="terminal-footer">
-            admin@smkn2pinrang:~$&nbsp;<span class="log-value">system --check --test-mode</span><span class="cursor"></span>
+        <div class="card">
+            <div class="card-label">Server Time</div>
+            <div class="card-value"><?= date('H:i:s') ?></div>
+        </div>
+        <div class="card">
+            <div class="card-label">Hostname</div>
+            <div class="card-value"><?= htmlspecialchars(gethostname()) ?></div>
+        </div>
+        <div class="card">
+            <div class="card-label">OS Platform</div>
+            <div class="card-value"><?= PHP_OS ?></div>
         </div>
     </div>
 
+    <div class="section">
+        <div class="section-title">// Environment Info</div>
+        <div class="info-row">
+            <span class="info-key">SERVER_SOFTWARE</span>
+            <span class="info-val"><?= htmlspecialchars($_SERVER['SERVER_SOFTWARE'] ?? 'Unknown') ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">REQUEST_URI</span>
+            <span class="info-val"><?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/') ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">SERVER_PROTOCOL</span>
+            <span class="info-val"><?= htmlspecialchars($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1') ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">HTTPS</span>
+            <span class="info-val"><?= (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? '✓ Enabled' : 'via Cloudflare' ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">PHP_SAPI</span>
+            <span class="info-val"><?= php_sapi_name() ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">Memory Limit</span>
+            <span class="info-val"><?= ini_get('memory_limit') ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">Max Execution Time</span>
+            <span class="info-val"><?= ini_get('max_execution_time') ?>s</span>
+        </div>
+        <div class="info-row">
+            <span class="info-key">Date Generated</span>
+            <span class="info-val"><?= date('Y-m-d H:i:s T') ?></span>
+        </div>
+    </div>
+
+    <div class="success-banner">
+        <div class="success-icon">✦</div>
+        <div class="success-text">
+            <strong>Deployment Successful</strong>
+            PHP is running correctly on Coolify via Cloudflare Tunnel
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-left">COM SMKN 2 PINRANG &copy; <?= date('Y') ?> &mdash; Powered by Coolify + Cloudflare</div>
+        <div class="footer-right">
+            <div class="dot" style="background:#00ff88"></div>
+            <div class="dot" style="background:#3366ff"></div>
+            <div class="dot" style="background:#ff3366"></div>
+        </div>
+    </footer>
+
+</div>
 </body>
 </html>
